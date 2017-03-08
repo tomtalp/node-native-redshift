@@ -1,0 +1,22 @@
+{
+  "name": "node-native-redshift",
+  "version": "1.0.0",
+  "description": "A Node.js Redshift client using the native Redshift ODBC/JDBC drivers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomtalp/node-native-redshift.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tomtalp/node-native-redshift/issues"
+  },
+  "homepage": "https://github.com/tomtalp/node-native-redshift#readme",
+  "dependencies": {
+    "odbc": "^1.2.1"
+  }
+}
