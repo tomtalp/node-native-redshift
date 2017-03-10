@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/tomtalp/node-native-redshift#readme",
   "dependencies": {
+    "bluebird": "^3.5.0",
+    "co": "^4.6.0",
     "jdbc": "^0.4.0",
     "odbc": "^1.2.1"
   }
