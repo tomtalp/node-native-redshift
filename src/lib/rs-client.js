@@ -8,6 +8,10 @@ class Client {
     this.conf = conf;
     this.base = baseClient.getBaseClient(conf);
   }
+
+  *connect() {
+    yield this.base.connect();
+  }
 }
 
 module.exports = {

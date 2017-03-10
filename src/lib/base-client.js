@@ -1,3 +1,6 @@
+const Promise = require('bluebird')
+    ;
+
 function getBaseClient(conf) {
   if (conf.driverType == 'ODBC') {
     return new BaseODBC(conf);
@@ -17,17 +20,49 @@ class BaseODBC {
 
 class BaseJDBC {
   constructor(conf) {
+    this.conf = conf;
+    this.connString = this.getConnString();
+
     try {
       this.driver = require('jdbc');
       this.jinst = require('jdbc/lib/jinst');
-      if (!this.jinst.isJvmCreated()) {
-        this.jinst.addOption("-Xrs");
-        this.jinst.setupClasspath([conf.driverConfig.driverPath]);
-      }
+      this.initJVM();
     } catch (e) {
       throw new Error(`Error initializing JDBC libraries - ${e.message}`);
     }
+  }
 
+  getConnString() {
+    return `jdbc:redshift://${this.conf.host}:${this.conf.port}/${this.conf.db}`;
+  }
+
+  initJVM() {
+    if (!this.jinst.isJvmCreated()) {
+      this.jinst.addOption("-Xrs");
+      this.jinst.setupClasspath([this.conf.driverConfig.driverPath]);
+    }
+  }
+
+  *connect() {
+    let jdbcConfig = {
+      url: this.connString,
+      drivename: this.conf.driverConfig.jdbcClassName,
+      properties: {
+        user: this.conf.user,
+        password: this.conf.pass
+      }
+    };
+
+    let jdbcClient = new this.driver(jdbcConfig);
+    this.jdbcClient = Promise.promisifyAll(jdbcClient);
+
+    try {
+      yield this.jdbcClient.initializeAsync();
+      console.log("Successfully configured JDBC Redshift client");
+    } catch (e) {
+      console.log("Failed creating JDBC client - ", e);
+      throw e;
+    }
   }
 }
 
