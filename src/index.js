@@ -20,6 +20,7 @@ function main() {
     yield rs.connect();
     let res = yield rs.query("SELECT * FROM STL_LOAD_COMMITS LIMIT 5");
     console.log("res - ", res);
+    yield rs.close();
   }).catch(function(err){
     console.log("Error - ", err);
   })
