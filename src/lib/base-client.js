@@ -44,6 +44,11 @@ class BaseJDBC {
   }
 
   *connect() {
+    yield this.initClient();
+    yield this.initConnection();
+  }
+
+  *initClient() {
     let jdbcConfig = {
       url: this.connString,
       drivename: this.conf.driverConfig.jdbcClassName,
@@ -52,7 +57,6 @@ class BaseJDBC {
         password: this.conf.pass
       }
     };
-
     let jdbcClient = new this.driver(jdbcConfig);
     this.jdbcClient = Promise.promisifyAll(jdbcClient);
 
@@ -63,6 +67,29 @@ class BaseJDBC {
       console.log("Failed creating JDBC client - ", e);
       throw e;
     }
+  }
+
+  // Reserve a single connection in the connection pool, and initialize
+  // a connection object from it.
+  *initConnection() {
+    try {
+      let reservedConn = yield this.jdbcClient.reserveAsync();
+      this.jdbcConnection = Promise.promisifyAll(reservedConn.conn);
+      console.log("Successfully reserved connection from conn pool");
+    } catch (e) {
+      console.log("Failed initializing JDBC connection");
+      throw e;
+    }
+  }
+
+  *query(sqlQuery) {
+    let statement = yield this.jdbcConnection.createStatementAsync();
+    statement = Promise.promisifyAll(statement);
+
+    let resultSet = yield statement.executeQueryAsync(sqlQuery);
+    resultSet = Promise.promisifyAll(resultSet)
+
+    return yield resultSet.toObjArrayAsync();
   }
 }
 

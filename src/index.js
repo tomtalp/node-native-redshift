@@ -18,6 +18,10 @@ function main() {
     }
     let rs = new rsClient.Client(conf);
     yield rs.connect();
+    let res = yield rs.query("SELECT * FROM STL_LOAD_COMMITS LIMIT 5");
+    console.log("res - ", res);
+  }).catch(function(err){
+    console.log("Error - ", err);
   })
 }
 main();
