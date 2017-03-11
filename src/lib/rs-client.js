@@ -17,6 +17,10 @@ class Client {
     let res =  yield this.base.query(sql);
     return res;
   }
+
+  *close() {
+    yield this.base.close();
+  }
 }
 
 module.exports = {

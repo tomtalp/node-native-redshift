@@ -91,6 +91,11 @@ class BaseJDBC {
 
     return yield resultSet.toObjArrayAsync();
   }
+
+  // Close connection
+  *close() {
+    yield this.jdbcClient.releaseAsync(this.jdbcConnection);
+  }
 }
 
 // class BaseClient {
