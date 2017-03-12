@@ -83,6 +83,9 @@ class BaseJDBC {
   }
 
   *query(sqlQuery) {
+    if (!this.jdbcConnection) {
+      throw new Error("You must be connected to the DB in order to perform a query");
+    }
     let statement = yield this.jdbcConnection.createStatementAsync();
     statement = Promise.promisifyAll(statement);
 
@@ -92,9 +95,10 @@ class BaseJDBC {
     return yield resultSet.toObjArrayAsync();
   }
 
-  // Close connection
+  // Close connection & reset the conn object.
   *close() {
     yield this.jdbcClient.releaseAsync(this.jdbcConnection);
+    this.jdbcConnection = undefined;
   }
 }
 
