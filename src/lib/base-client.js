@@ -59,7 +59,6 @@ class BaseJDBC {
     };
     let jdbcClient = new this.driver(jdbcConfig);
     this.jdbcClient = Promise.promisifyAll(jdbcClient);
-
     try {
       yield this.jdbcClient.initializeAsync();
       console.log("Successfully configured JDBC Redshift client");
@@ -134,5 +133,7 @@ class BaseJDBC {
 // }
 
 module.exports = {
-  getBaseClient: getBaseClient
+  getBaseClient: getBaseClient,
+  BaseJDBC: BaseJDBC,
+  BaseODBC: BaseODBC
 };
