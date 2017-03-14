@@ -47,6 +47,56 @@ describe("Base client", function(){
         });
       })
     });
+    describe("initJVM()", function(){
+      describe("JVM not initialized", function(){
+        beforeEach(function(){
+          stub(baseJdbc.jinst, "isJvmCreated", function(){
+            return false;
+          });
+          stub(baseJdbc.jinst, "addOption", function(){
+            return {};
+          });
+          stub(baseJdbc.jinst, "setupClasspath", function(){
+            return {};
+          });
+        })
+        afterEach(function(){
+          baseJdbc.jinst.isJvmCreated.restore();
+          baseJdbc.jinst.addOption.restore();
+          baseJdbc.jinst.setupClasspath.restore();
+        })
+        it("Should call JVM initialization functions", function(done){
+          baseJdbc.initJVM();
+          expect(baseJdbc.jinst.addOption.called).to.be.true;
+          expect(baseJdbc.jinst.setupClasspath.called).to.be.true;
+          done();
+        });
+      });
+      describe("JVM initialized", function(){
+        beforeEach(function(){
+          stub(baseJdbc.jinst, "isJvmCreated", function(){
+            return true;
+          });
+          stub(baseJdbc.jinst, "addOption", function(){
+            return {};
+          });
+          stub(baseJdbc.jinst, "setupClasspath", function(){
+            return {};
+          });
+        })
+        afterEach(function(){
+          baseJdbc.jinst.isJvmCreated.restore();
+          baseJdbc.jinst.addOption.restore();
+          baseJdbc.jinst.setupClasspath.restore();
+        })
+        it("Should not call JVM initialization functions if JVM is initialized", function(done){
+          baseJdbc.initJVM();
+          expect(baseJdbc.jinst.addOption.called).to.be.false;
+          expect(baseJdbc.jinst.setupClasspath.called).to.be.false;
+          done();
+        });
+      });
+    });
     describe("initConnection()", function(){
       describe("Failure", function(){
         beforeEach(function(){
@@ -67,8 +117,67 @@ describe("Base client", function(){
     });
     describe("initClient()", function(){
       describe("Failure", function(){
-
+        beforeEach(function(){
+          baseJdbc.driver = stub().returns({
+            initialize: function(cb) {
+              throw new Error("Failed initializing client");
+              cb();
+            }
+          });
+        });
+        afterEach(function(){
+          baseJdbc.driver = {};
+        })
+        it("Should throw an error if client initialization fails", function*(done) {
+          try {
+            yield baseJdbc.initClient();
+          } catch (e) {
+            done();
+          }
+        });
       })
     })
+    describe("query()", function(){
+      describe("Success", function(){
+        var createStatementStub = stub();
+        var execQueryStub = stub();
+        beforeEach(function(){
+          // TODO - This feels like a bit of a hack, there must be a cleaner way to do this...
+          baseJdbc.jdbcConnection = {
+            createStatementAsync: function*(){
+              createStatementStub(); // Call the stub so we can assert func was called
+              return {
+                executeQueryAsync: function*(){
+                  execQueryStub(arguments['0']); // Call the stub so we can assert func was called
+                  return {
+                    toObjArrayAsync: function*(){
+                      return {};
+                    }
+                  };
+                }
+              }
+            }
+          }
+        });
+        it("Should create a statement & execute a query", function*(done){
+          try {
+            let fakeQuery = "FakeQuery";
+            yield baseJdbc.query(fakeQuery);
+            expect(createStatementStub.called).to.be.true;
+            expect(execQueryStub.called).to.be.true;
+            expect(execQueryStub.calledWith(fakeQuery)).to.be.true;
+            done();
+          } catch (e) {
+            console.log(e);
+          }
+        })
+      });
+      describe("Failure", function(){
+
+      });
+    });
+    describe("close()", function(){
+
+    });
   })
 });

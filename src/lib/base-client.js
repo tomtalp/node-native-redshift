@@ -63,7 +63,7 @@ class BaseJDBC {
       yield this.jdbcClient.initializeAsync();
       console.log("Successfully configured JDBC Redshift client");
     } catch (e) {
-      console.log("Failed creating JDBC client - ", e);
+      console.log("Failed creating JDBC client");
       throw e;
     }
   }
@@ -87,10 +87,8 @@ class BaseJDBC {
     }
     let statement = yield this.jdbcConnection.createStatementAsync();
     statement = Promise.promisifyAll(statement);
-
     let resultSet = yield statement.executeQueryAsync(sqlQuery);
     resultSet = Promise.promisifyAll(resultSet)
-
     return yield resultSet.toObjArrayAsync();
   }
 
