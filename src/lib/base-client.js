@@ -97,6 +97,15 @@ class BaseJDBC {
     yield this.jdbcClient.releaseAsync(this.jdbcConnection);
     this.jdbcConnection = undefined;
   }
+
+  *update(sqlQuery) {
+    if (!this.jdbcConnection) {
+      throw new Error("You must be connected to the DB in order to perform a query");
+    }
+    let statement = yield this.jdbcConnection.createStatementAsync();
+    statement = Promise.promisifyAll(statement);
+    return yield statement.executeUpdateAsync(sqlQuery);
+  }
 }
 
 // class BaseClient {

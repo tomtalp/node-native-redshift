@@ -21,6 +21,10 @@ class Client {
   *close() {
     yield this.base.close();
   }
+
+  *update(sql) {
+    return yield this.base.update(sql);
+  }
 }
 
 module.exports = {
