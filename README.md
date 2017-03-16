@@ -27,4 +27,4 @@ General guidelines for installing the Redshift ODBC/JDBC drivers can be found in
 * ODBC - http://docs.aws.amazon.com/redshift/latest/mgmt/configure-odbc-connection.html
 * JDBC - http://docs.aws.amazon.com/redshift/latest/mgmt/configure-jdbc-connection.html
 
-###### *The project is in it's very early stages, and isn't production-ready*
+###### *The project is in its very early stages, and isn't production-ready*
