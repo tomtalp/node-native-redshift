@@ -25,6 +25,10 @@ class Client {
   *update(sql) {
     return yield this.base.update(sql);
   }
+
+  *copy(copyConf) {
+    return yield this.base.copy(copyConf);
+  }
 }
 
 module.exports = {
